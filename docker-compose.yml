@@ -1,0 +1,204 @@
+# DockerGPT Memory: the whole system with one command.
+#
+#   cp .env.example .env              # fill in the JarvisLabs values
+#   docker compose up -d              # infra + api + worker + watcher
+#   docker compose --profile web up -d            # + the Next.js UI (once web/ exists)
+#   docker compose --profile aws up -d --build    # on EC2: + web + Caddy (HTTPS on sslip.io)
+#
+# The same .env also serves host-run Python (README "Run it locally"), so the in-network
+# addresses below override the localhost ones from .env inside the containers.
+# Linux hosts only for api/worker/watcher (they need the Docker socket and DEMO_ROOT at the
+# same absolute path as on the host). On Windows, start just the infra:
+#   docker compose up -d postgres qdrant temporal temporal-ui
+
+name: dockergpt
+
+x-ignore: &ignore
+  dockergpt.ignore: "true"
+
+x-app-env: &app-env
+  DATABASE_URL: postgresql+psycopg://postgres:${POSTGRES_PASSWORD:-postgrespassword}@postgres:5432/dockergpt_memory
+  QDRANT_URL: http://qdrant:6333
+  TEMPORAL_ADDRESS: temporal:7233
+  API_URL: http://api:8000
+  DEMO_ROOT: ${DEMO_ROOT:-/opt/dockergpt/demo}
+  IGNORE_PROJECTS: dockergpt,nudgebee
+  # Kepler is a desktop app on Person 1's PC; inside containers it reports "skipped".
+  KEPLER_CLI: ""
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgrespassword}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./deploy/initdb:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    labels: *ignore
+    restart: unless-stopped
+
+  qdrant:
+    image: qdrant/qdrant:v1.19.0
+    ports:
+      - "6333:6333"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      # The image has no curl/wget; bash's /dev/tcp is enough to ask /readyz.
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/6333 && printf \"GET /readyz HTTP/1.0\\r\\n\\r\\n\" >&3 && grep -q \"200 OK\" <&3'"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    labels: *ignore
+    restart: unless-stopped
+
+  temporal:
+    image: temporalio/auto-setup:1.29.1
+    environment:
+      DB: postgres12
+      DB_PORT: "5432"
+      POSTGRES_USER: postgres
+      POSTGRES_PWD: ${POSTGRES_PASSWORD:-postgrespassword}
+      POSTGRES_SEEDS: postgres
+      BIND_ON_IP: 0.0.0.0
+      TEMPORAL_BROADCAST_ADDRESS: 127.0.0.1
+    ports:
+      - "7233:7233"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "temporal operator cluster health --address 127.0.0.1:7233 | grep -q SERVING"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 30s
+    labels: *ignore
+    restart: unless-stopped
+
+  temporal-ui:
+    image: temporalio/ui:2.44.0
+    environment:
+      TEMPORAL_ADDRESS: temporal:7233
+      TEMPORAL_CORS_ORIGINS: http://localhost:3000
+    ports:
+      - "8233:8080"
+    depends_on:
+      temporal:
+        condition: service_healthy
+    labels: *ignore
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    image: dockergpt-api:latest
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000
+    env_file:
+      - path: .env
+        required: false
+    environment: *app-env
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      temporal:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+    labels: *ignore
+    restart: unless-stopped
+
+  worker:
+    image: dockergpt-api:latest
+    command: python -m api.agent.worker
+    env_file:
+      - path: .env
+        required: false
+    environment: *app-env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Same absolute path as on the host, so compose paths the watcher reports work here too.
+      - type: bind
+        source: ${DEMO_ROOT:-/opt/dockergpt/demo}
+        target: ${DEMO_ROOT:-/opt/dockergpt/demo}
+    depends_on:
+      api:
+        condition: service_healthy
+      temporal:
+        condition: service_healthy
+    labels: *ignore
+    restart: unless-stopped
+
+  watcher:
+    image: dockergpt-api:latest
+    command: python -m watcher.main
+    env_file:
+      - path: .env
+        required: false
+    environment: *app-env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      api:
+        condition: service_healthy
+    labels: *ignore
+    restart: unless-stopped
+
+  web:
+    # In a profile until Person 2 pushes web/ (the build needs it); then drop `profiles`.
+    profiles: ["web", "aws"]
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL-http://localhost:8000}
+        NEXT_PUBLIC_TEMPORAL_UI_URL: ${NEXT_PUBLIC_TEMPORAL_UI_URL:-http://localhost:8233}
+    image: dockergpt-web:latest
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    labels: *ignore
+    restart: unless-stopped
+
+  caddy:
+    profiles: ["aws"]
+    image: caddy:2
+    environment:
+      PUBLIC_HOST: ${PUBLIC_HOST:-localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - api
+      - web
+    labels: *ignore
+    restart: unless-stopped
+
+volumes:
+  pg_data:
+  qdrant_data:
+  caddy_data:
+  caddy_config:

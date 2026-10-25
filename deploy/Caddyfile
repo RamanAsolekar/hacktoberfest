@@ -1,0 +1,14 @@
+# PUBLIC_HOST comes from .env, e.g. 13-232-1-2.sslip.io (the Elastic IP with dashes).
+# sslip.io resolves it to the IP with no DNS setup; Caddy fetches a Let's Encrypt cert automatically.
+{$PUBLIC_HOST} {
+	encode gzip
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+	handle /health {
+		reverse_proxy api:8000
+	}
+	handle {
+		reverse_proxy web:3000
+	}
+}
