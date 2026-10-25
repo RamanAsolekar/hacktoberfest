@@ -48,5 +48,6 @@ Updated after every change. Newest entries at the top of the log.
 
 ## Log
 
+- **2026-10-25 (GitHub):** `D:\hacktober\hacktoberfest` is now its own git repo, pushed to https://github.com/RamanAsolekar/hacktoberfest (branch `main`). `.env`, `.venv` and `jarvis/instance.json` are git-ignored; `.gitattributes` keeps LF line endings so the shell scripts run on Linux.
 - **2026-10-25 (move):** Moved the whole project from `D:\hacktober\nudgebee\dockergpt-memory` to `D:\hacktober\hacktoberfest` (not a git repo). Recreated `.venv` there; 29/29 tests pass. Updated `DEMO_ROOT` in `.env`. NudgeBee infra is still started from the nudgebee repo root, now with `-f ../hacktoberfest/infra/nudgebee-infra.override.yml`. Empty locked folders may remain at the old path until VS Code releases them; safe to delete.
 - **2026-10-25:** Initial build of all Person 1 parts plus working stand-ins. 29 tests (scrubber, guard, fixer safety, reasoning fallback, retrieval decay, 4 Temporal workflow paths). Verified live: NudgeBee infra up, API and worker running, `/api/agent/status` green for Temporal, Qdrant, Kepler, NudgeBee; Kepler diagnosis of a real stack-A crash. Moved Postgres to 5433 because of the native PostgreSQL on 5432.
