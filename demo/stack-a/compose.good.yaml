@@ -17,7 +17,7 @@ services:
       DB_HOST: db
       DB_NAME: orders
       DB_USER: postgres
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
       db:
         condition: service_healthy

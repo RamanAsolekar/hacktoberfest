@@ -14,9 +14,9 @@ services:
     build: ./app
     image: demo-inventory-api:1.0
     environment:
-      DB_HOST: db
-      DB_NAME: inventory
-      DB_USER: postgres
+      PGHOST: db
+      PGDATABASE: inventory
+      PGUSER: postgres
     depends_on:
       db:
         condition: service_healthy

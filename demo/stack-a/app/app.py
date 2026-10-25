@@ -6,7 +6,7 @@ import time
 import psycopg
 
 dsn = dict(host=os.environ.get("DB_HOST", "db"), dbname=os.environ.get("DB_NAME", "orders"),
-           user=os.environ.get("DB_USER", "postgres"), password=os.environ.get("POSTGRES_PASSWORD"),
+           user=os.environ.get("DB_USER", "postgres"), password=os.environ.get("DB_PASSWORD"),
            connect_timeout=5)
 print("orders-service starting, connecting to", dsn["host"], flush=True)
 try:

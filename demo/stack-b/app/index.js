@@ -1,14 +1,10 @@
-// Inventory API (demo). Connects to Postgres and keeps a heartbeat query running.
+// Inventory API (demo). Connects to Postgres using the standard PG* environment variables
+// (PGHOST, PGDATABASE, PGUSER, PGPASSWORD), which node-postgres reads natively.
 const { Client } = require("pg");
 
-const client = new Client({
-  host: process.env.DB_HOST || "db",
-  database: process.env.DB_NAME || "inventory",
-  user: process.env.DB_USER || "postgres",
-  password: process.env.DB_PASSWORD,
-});
+const client = new Client();
 
-console.log("inventory-api starting, connecting to", client.host);
+console.log("inventory-api starting, connecting to", process.env.PGHOST);
 client
   .connect()
   .then(() => {

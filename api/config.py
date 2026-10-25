@@ -31,8 +31,9 @@ class Settings:
     embed_base_url: str = _get("EMBED_BASE_URL")
     embed_model: str = _get("EMBED_MODEL", "BAAI/bge-small-en-v1.5")
     embed_api_key: str = _get("EMBED_API_KEY", "none")
+    reasoning_budget: int = int(_get("LLM_REASONING_BUDGET", "3000"))
 
-    confidence_threshold: float = float(_get("CONFIDENCE_THRESHOLD", "0.6"))
+    confidence_threshold: float = float(_get("CONFIDENCE_THRESHOLD", "0.7"))
     approval_timeout_min: int = int(_get("APPROVAL_TIMEOUT_MIN", "15"))
     health_window_sec: int = int(_get("HEALTH_WINDOW_SEC", "25"))
     demo_root: str = _get("DEMO_ROOT", str(PROJECT_ROOT / "demo"))

@@ -14,10 +14,10 @@ services:
     build: ./app
     image: demo-inventory-api:1.0
     environment:
-      DB_HOST: db
-      DB_NAME: inventory
-      DB_USER: postgres
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      PGHOST: db
+      PGDATABASE: inventory
+      PGUSER: postgres
+      PGPASSWORD: ${POSTGRES_PASSWORD}
     depends_on:
       db:
         condition: service_healthy

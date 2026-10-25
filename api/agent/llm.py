@@ -47,8 +47,9 @@ def chat_json(system: str, user: str, *, model: str | None = None, base_url: str
     messages = [{"role": "user", "content": f"{system}\n\n---\n\n{user}"}]
     last_error: Exception | None = None
     for _ in range(2):
+        # Thinking models (e.g. Gemma 4) spend tokens on reasoning before answering: add an allowance.
         kwargs: dict[str, Any] = dict(model=model or settings.llm_model, messages=messages, temperature=0.1,
-                                      max_tokens=max_tokens)
+                                      max_tokens=max_tokens + settings.reasoning_budget)
         try:
             if _json_mode_ok:
                 kwargs["response_format"] = {"type": "json_object"}
@@ -97,7 +98,7 @@ def health() -> dict[str, Any]:
         if not url:
             raise LLMNotConfigured("LLM_BASE_URL is not set")
         quick = OpenAI(base_url=url, api_key=key or "none", timeout=30, max_retries=0)
-        reply = quick.chat.completions.create(model=settings.llm_model, max_tokens=3,
+        reply = quick.chat.completions.create(model=settings.llm_model, max_tokens=300,
                                               messages=[{"role": "user", "content": "Say ok"}])
         out["llm"] = {"ok": True, "url": url, "model": settings.llm_model,
                       "reply": (reply.choices[0].message.content or "")[:20]}
