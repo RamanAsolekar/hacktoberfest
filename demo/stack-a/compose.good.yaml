@@ -1,0 +1,24 @@
+name: stack-a
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: orders
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d orders"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+  app:
+    build: ./app
+    image: demo-orders-service:1.0
+    environment:
+      DB_HOST: db
+      DB_NAME: orders
+      DB_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure

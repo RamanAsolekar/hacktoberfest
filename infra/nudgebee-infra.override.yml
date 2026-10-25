@@ -1,0 +1,8 @@
+# Used with the repo-root docker-compose.yaml to run DockerGPT Memory on NudgeBee's own infra:
+#   docker compose -f docker-compose.yaml -f ../hacktoberfest/infra/nudgebee-infra.override.yml \
+#     up -d postgres qdrant temporal temporal-ui migrations
+# Adds host port 5433 for Postgres, because a native Postgres often already owns 5432 on dev machines.
+services:
+  postgres:
+    ports:
+      - "5433:5432"

@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/RamanAsolekar/nudgebee/dockergpt-memory/contracts/incident.schema.json",
+  "title": "DockerGPT Memory incident",
+  "description": "One container failure, from detection to stored lesson. Six parts from the problem statement: symptom, context, evidence, root cause, fix, outcome. env_keys hold variable NAMES only, never values.",
+  "type": "object",
+  "required": ["id", "status", "symptom", "context", "evidence"],
+  "properties": {
+    "id": {"type": "string", "description": "UUID"},
+    "external_id": {"type": ["string", "null"], "description": "Seed or NudgeBee id, e.g. seed-oom-killed, nudgebee-<event id>"},
+    "status": {"enum": ["detected", "retrieving", "reasoning", "awaiting_approval", "applying", "verifying", "resolved", "rolled_back", "rejected", "expired"]},
+    "source": {"enum": ["memory", "fresh", "seed", "nudgebee-seed", null], "description": "memory = matched a past case with confidence >= 0.6; fresh = diagnosed from scratch"},
+    "is_negative": {"type": "boolean", "description": "true when the fix failed and was rolled back; never suggested again"},
+    "root_cause_key": {"type": ["string", "null"], "description": "Short kebab label, e.g. missing-db-password; used for recurrence"},
+    "workflow_id": {"type": ["string", "null"], "description": "Temporal workflow id, incident-<id>"},
+    "detected_at": {"type": "string", "format": "date-time"},
+    "resolved_at": {"type": ["string", "null"], "format": "date-time"},
+    "last_confirmed_at": {"type": ["string", "null"], "format": "date-time"},
+    "symptom": {
+      "type": "object",
+      "properties": {
+        "error_message": {"type": "string"},
+        "exit_code": {"type": ["integer", "null"]},
+        "restart_count": {"type": ["integer", "null"]},
+        "restart_pattern": {"type": ["string", "null"]},
+        "oom_killed": {"type": "boolean"}
+      }
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "container": {"type": "string"},
+        "image": {"type": ["string", "null"]},
+        "image_tag": {"type": ["string", "null"]},
+        "base_image": {"type": ["string", "null"]},
+        "compose_project": {"type": ["string", "null"]},
+        "compose_service": {"type": ["string", "null"]},
+        "compose_dir": {"type": ["string", "null"]},
+        "compose_files": {"type": "array", "items": {"type": "string"}},
+        "mem_limit": {"type": ["string", "null"]},
+        "cpu_limit": {"type": ["number", "null"]},
+        "restart_policy": {"type": ["string", "null"]},
+        "env_keys": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "properties": {
+        "log_lines": {"type": "array", "items": {"type": "string"}},
+        "resource_stats": {"type": "object", "properties": {"cpu_pct": {"type": ["number", "null"]}, "mem_mb": {"type": ["number", "null"]}, "power_watts": {"type": ["number", "null"]}}},
+        "kepler_analysis": {"type": ["string", "null"], "description": "Read-only investigation by the local Kepler SRE agent"},
+        "guard_flags": {"type": "integer", "description": "Log lines removed by the injection guard"},
+        "trigger": {"enum": ["crashed", "oom", "unhealthy"]}
+      }
+    },
+    "root_cause": {"type": ["string", "null"]},
+    "fix": {
+      "type": "object",
+      "properties": {
+        "type": {"enum": ["compose_patch", "env_patch", "command"]},
+        "content": {"type": "string", "description": "compose_patch: lines 'services.<svc>.<path>: <value>'; env_patch: 'KEY=value' lines; command: 'docker compose up -d|restart <svc>'"},
+        "rationale": {"type": "string"},
+        "held": {"type": ["boolean", "null"]}
+      }
+    },
+    "match": {
+      "type": "object",
+      "properties": {
+        "matched_incident_id": {"type": ["string", "null"]},
+        "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "explanation": {"type": "string"},
+        "score": {"type": ["number", "null"], "description": "Retrieval score after age decay"},
+        "matched_incident": {"type": "object", "description": "Full past incident; only in GET /api/incidents/{id}"},
+        "memory_check": {"type": ["object", "null"], "description": "For fresh diagnoses: what memory offered and its confidence"}
+      }
+    },
+    "outcome": {
+      "type": "object",
+      "properties": {
+        "time_to_resolve_sec": {"type": ["integer", "null"]},
+        "approved_by": {"type": ["string", "null"]},
+        "recurred": {"type": "boolean"},
+        "resolved_by_memory": {"type": "boolean"}
+      }
+    },
+    "timeline": {
+      "type": "array",
+      "description": "Only in GET /api/incidents/{id}",
+      "items": {"type": "object", "properties": {"step": {"type": "string"}, "status": {"type": "string"}, "message": {"type": "string"}, "at": {"type": "string", "format": "date-time"}}}
+    }
+  }
+}

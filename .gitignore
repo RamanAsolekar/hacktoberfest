@@ -1,0 +1,11 @@
+# secrets and local state
+.env
+*.env.local
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+# fix backups written by the worker
+*.dockergpt.bak
+jarvis/instance.json
+eval/results.local.md

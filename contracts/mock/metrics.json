@@ -1,0 +1,23 @@
+{
+  "first_time_avg_ttr_sec": 412.0,
+  "repeat_avg_ttr_sec": 38.0,
+  "pct_resolved_by_memory": 0.5,
+  "suggestion_accuracy": 0.75,
+  "recurred_count": 0,
+  "memory_total": 9,
+  "incidents_total": 6,
+  "memory_growth": [
+    {
+      "at": "2026-10-25T09:30:00+00:00",
+      "total": 7
+    },
+    {
+      "at": "2026-10-25T10:05:00+00:00",
+      "total": 8
+    },
+    {
+      "at": "2026-10-25T10:10:00+00:00",
+      "total": 9
+    }
+  ]
+}

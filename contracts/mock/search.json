@@ -1,0 +1,124 @@
+[
+  {
+    "id": "1a2b3c4d-0000-4000-8000-00000000000a",
+    "external_id": null,
+    "status": "resolved",
+    "source": "fresh",
+    "is_negative": false,
+    "root_cause_key": "missing-db-password",
+    "workflow_id": "incident-1a2b3c4d-0000-4000-8000-00000000000a",
+    "detected_at": "2026-10-25T10:00:00+00:00",
+    "resolved_at": "2026-10-25T10:06:54+00:00",
+    "last_confirmed_at": "2026-10-25T10:14:00+00:00",
+    "symptom": {
+      "error_message": "FATAL: database connection failed: connection failed: connection to server at \"[REDACTED:host]\", port 5432 failed: fe_sendauth: no password supplied",
+      "exit_code": 1,
+      "restart_count": 3,
+      "restart_pattern": "crashed; 4 exits in the last 5 min",
+      "oom_killed": false
+    },
+    "context": {
+      "container": "stack-a-app-1",
+      "image": "demo-orders-service",
+      "image_tag": "1.0",
+      "base_image": "python:3.11-slim",
+      "compose_project": "stack-a",
+      "compose_service": "app",
+      "compose_dir": "/demo/stack-a",
+      "compose_files": [],
+      "mem_limit": null,
+      "cpu_limit": null,
+      "restart_policy": "on-failure",
+      "env_keys": [
+        "DB_HOST",
+        "DB_NAME",
+        "DB_USER",
+        "PATH"
+      ]
+    },
+    "evidence": {
+      "log_lines": [
+        "orders-service starting, connecting to db",
+        "FATAL: database connection failed: connection failed: connection to server at \"[REDACTED:host]\", port 5432 failed: fe_sendauth: no password supplied"
+      ],
+      "resource_stats": {
+        "cpu_pct": 0.4,
+        "mem_mb": 21.5,
+        "power_watts": null
+      },
+      "kepler_analysis": "Observed: stack-a-app-1 exits with code 1 every few seconds.\nLikely cause (high): the app service has no POSTGRES_PASSWORD, so libpq sends no password.\nNext step: pass the db password variable to the app service.",
+      "guard_flags": 0,
+      "trigger": "crashed"
+    },
+    "root_cause": "The app service is missing the database password variable, so the Postgres client connects with no password.",
+    "fix": {
+      "type": "compose_patch",
+      "content": "services.app.environment.POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}",
+      "rationale": "Pass the db's password variable to the app service.",
+      "held": true
+    },
+    "match": {
+      "matched_incident_id": null,
+      "confidence": 0.2,
+      "explanation": "No remembered incident shares this root cause.",
+      "memory_check": {
+        "confidence": 0.2,
+        "matched_incident_id": null
+      }
+    },
+    "outcome": {
+      "time_to_resolve_sec": 412,
+      "approved_by": "raman",
+      "recurred": false,
+      "resolved_by_memory": false
+    },
+    "score": 0.81
+  },
+  {
+    "id": "aaaa0000-0000-4000-8000-000000000002",
+    "external_id": null,
+    "status": "rolled_back",
+    "source": "fresh",
+    "is_negative": true,
+    "root_cause_key": "oom-killed-memory-limit",
+    "workflow_id": "incident-aaaa0000-0000-4000-8000-000000000002",
+    "detected_at": "2026-10-25T10:08:00+00:00",
+    "resolved_at": null,
+    "last_confirmed_at": null,
+    "symptom": {
+      "error_message": "container killed: OOMKilled (exit 137)",
+      "exit_code": 137,
+      "restart_count": 2,
+      "restart_pattern": "crashed"
+    },
+    "context": {
+      "image": "demo-worker",
+      "image_tag": "1.0",
+      "compose_project": "shop",
+      "compose_service": "worker",
+      "env_keys": []
+    },
+    "evidence": {
+      "log_lines": [
+        "container killed: OOMKilled (exit 137)"
+      ],
+      "resource_stats": {},
+      "guard_flags": 0,
+      "trigger": "crashed"
+    },
+    "root_cause": null,
+    "fix": {},
+    "match": {
+      "matched_incident_id": null,
+      "confidence": 0.0,
+      "explanation": ""
+    },
+    "outcome": {
+      "time_to_resolve_sec": null,
+      "approved_by": null,
+      "recurred": false,
+      "resolved_by_memory": false
+    },
+    "score": 0.43
+  }
+]

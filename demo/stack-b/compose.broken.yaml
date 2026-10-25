@@ -1,0 +1,23 @@
+name: stack-b
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: inventory
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d inventory"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+  api:
+    build: ./app
+    image: demo-inventory-api:1.0
+    environment:
+      DB_HOST: db
+      DB_NAME: inventory
+      DB_USER: postgres
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure

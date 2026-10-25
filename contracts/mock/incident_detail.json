@@ -1,0 +1,190 @@
+{
+  "id": "6f1c2a9e-0000-4000-8000-00000000000b",
+  "external_id": null,
+  "status": "awaiting_approval",
+  "source": "memory",
+  "is_negative": false,
+  "root_cause_key": "missing-db-password",
+  "workflow_id": "incident-6f1c2a9e-0000-4000-8000-00000000000b",
+  "detected_at": "2026-10-25T10:14:00+00:00",
+  "resolved_at": null,
+  "last_confirmed_at": null,
+  "symptom": {
+    "error_message": "Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string",
+    "exit_code": 1,
+    "restart_count": 4,
+    "restart_pattern": "crashed; 5 exits in the last 5 min",
+    "oom_killed": false
+  },
+  "context": {
+    "container": "stack-b-api-1",
+    "image": "demo-inventory-api",
+    "image_tag": "1.0",
+    "base_image": "node:20-alpine",
+    "compose_project": "stack-b",
+    "compose_service": "api",
+    "compose_dir": "/demo/stack-b",
+    "compose_files": [],
+    "mem_limit": null,
+    "cpu_limit": null,
+    "restart_policy": "on-failure",
+    "env_keys": [
+      "DB_HOST",
+      "DB_NAME",
+      "DB_USER",
+      "NODE_VERSION",
+      "PATH"
+    ]
+  },
+  "evidence": {
+    "log_lines": [
+      "inventory-api starting, connecting to db",
+      "Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string"
+    ],
+    "resource_stats": {
+      "cpu_pct": 0.3,
+      "mem_mb": 38.2,
+      "power_watts": null
+    },
+    "kepler_analysis": "Observed: stack-b-api-1 restarts with exit 1.\nLikely cause (high): DB_PASSWORD is not set on the api service.\nNext step: set DB_PASSWORD from the db's POSTGRES_PASSWORD.",
+    "guard_flags": 0,
+    "trigger": "crashed"
+  },
+  "root_cause": "The api service has no DB_PASSWORD, so the pg client sends an undefined password.",
+  "fix": {
+    "type": "compose_patch",
+    "content": "services.api.environment.DB_PASSWORD: ${POSTGRES_PASSWORD}",
+    "rationale": "Same fix as the remembered stack-a incident, adapted to this stack's variable name.",
+    "held": null
+  },
+  "match": {
+    "matched_incident_id": "1a2b3c4d-0000-4000-8000-00000000000a",
+    "confidence": 0.88,
+    "score": 0.71,
+    "explanation": "Both are app containers that crash right after start because the database password variable is missing from the app service; the different error text comes from different client libraries (libpq vs node-postgres).",
+    "matched_incident": {
+      "id": "1a2b3c4d-0000-4000-8000-00000000000a",
+      "external_id": null,
+      "status": "resolved",
+      "source": "fresh",
+      "is_negative": false,
+      "root_cause_key": "missing-db-password",
+      "workflow_id": "incident-1a2b3c4d-0000-4000-8000-00000000000a",
+      "detected_at": "2026-10-25T10:00:00+00:00",
+      "resolved_at": "2026-10-25T10:06:54+00:00",
+      "last_confirmed_at": "2026-10-25T10:14:00+00:00",
+      "symptom": {
+        "error_message": "FATAL: database connection failed: connection failed: connection to server at \"[REDACTED:host]\", port 5432 failed: fe_sendauth: no password supplied",
+        "exit_code": 1,
+        "restart_count": 3,
+        "restart_pattern": "crashed; 4 exits in the last 5 min",
+        "oom_killed": false
+      },
+      "context": {
+        "container": "stack-a-app-1",
+        "image": "demo-orders-service",
+        "image_tag": "1.0",
+        "base_image": "python:3.11-slim",
+        "compose_project": "stack-a",
+        "compose_service": "app",
+        "compose_dir": "/demo/stack-a",
+        "compose_files": [],
+        "mem_limit": null,
+        "cpu_limit": null,
+        "restart_policy": "on-failure",
+        "env_keys": [
+          "DB_HOST",
+          "DB_NAME",
+          "DB_USER",
+          "PATH"
+        ]
+      },
+      "evidence": {
+        "log_lines": [
+          "orders-service starting, connecting to db",
+          "FATAL: database connection failed: connection failed: connection to server at \"[REDACTED:host]\", port 5432 failed: fe_sendauth: no password supplied"
+        ],
+        "resource_stats": {
+          "cpu_pct": 0.4,
+          "mem_mb": 21.5,
+          "power_watts": null
+        },
+        "kepler_analysis": "Observed: stack-a-app-1 exits with code 1 every few seconds.\nLikely cause (high): the app service has no POSTGRES_PASSWORD, so libpq sends no password.\nNext step: pass the db password variable to the app service.",
+        "guard_flags": 0,
+        "trigger": "crashed"
+      },
+      "root_cause": "The app service is missing the database password variable, so the Postgres client connects with no password.",
+      "fix": {
+        "type": "compose_patch",
+        "content": "services.app.environment.POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}",
+        "rationale": "Pass the db's password variable to the app service.",
+        "held": true
+      },
+      "match": {
+        "matched_incident_id": null,
+        "confidence": 0.2,
+        "explanation": "No remembered incident shares this root cause.",
+        "memory_check": {
+          "confidence": 0.2,
+          "matched_incident_id": null
+        }
+      },
+      "outcome": {
+        "time_to_resolve_sec": 412,
+        "approved_by": "raman",
+        "recurred": false,
+        "resolved_by_memory": false
+      }
+    }
+  },
+  "outcome": {
+    "time_to_resolve_sec": null,
+    "approved_by": null,
+    "recurred": false,
+    "resolved_by_memory": true
+  },
+  "timeline": [
+    {
+      "step": "detect",
+      "status": "detected",
+      "message": "Failure recorded",
+      "at": "2026-10-25T10:14:00+00:00"
+    },
+    {
+      "step": "kepler",
+      "status": "done",
+      "message": "Kepler investigated: Observed: stack-b-api-1 restarts with exit 1.",
+      "at": "2026-10-25T10:14:24+00:00"
+    },
+    {
+      "step": "retrieve",
+      "status": "retrieving",
+      "message": "Searching memory for similar failures",
+      "at": "2026-10-25T10:14:27+00:00"
+    },
+    {
+      "step": "retrieve",
+      "status": "done",
+      "message": "3 similar past incidents: missing-db-password (0.71), starts-before-db-ready (0.52), missing-redis-url (0.49)",
+      "at": "2026-10-25T10:14:30+00:00"
+    },
+    {
+      "step": "reason",
+      "status": "reasoning",
+      "message": "Comparing with past incidents",
+      "at": "2026-10-25T10:14:30+00:00"
+    },
+    {
+      "step": "reason",
+      "status": "done",
+      "message": "Matched a remembered incident (88% confident). Proposed compose_patch: services.api.environment.DB_PASSWORD: ${POSTGRES_PASSWORD}",
+      "at": "2026-10-25T10:14:36+00:00"
+    },
+    {
+      "step": "approve",
+      "status": "awaiting_approval",
+      "message": "Waiting for a human to approve the fix",
+      "at": "2026-10-25T10:14:36+00:00"
+    }
+  ]
+}
