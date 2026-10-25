@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0d14">
+  <title>DockerGPT Memory | Incident Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="#"><span class="brand-symbol"><span>◈</span></span><span class="brand-copy"><b>DockerGPT</b><small>MEMORY ENGINE</small></span></a>
+      <div class="workspace-switch"><span class="workspace-avatar">P</span><span><small>WORKSPACE</small><b>Production stack</b></span><span class="switch-chevron">⌄</span></div>
+      <div class="nav-label">OBSERVABILITY</div>
+      <nav class="navigation">
+        <button class="nav-item active" data-view="overview"><span class="nav-ico">▦</span><span>Overview</span><span class="nav-pip"></span></button>
+        <button class="nav-item" data-view="incidents"><span class="nav-ico">⌁</span><span>Incidents</span><span class="nav-badge" id="nav-pending">2</span></button>
+        <button class="nav-item" data-view="memory"><span class="nav-ico">◉</span><span>Memory bank</span></button>
+        <button class="nav-item" data-view="metrics"><span class="nav-ico">↗</span><span>Analytics</span></button>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <div class="ai-card"><div class="ai-card-top"><span class="ai-orb">✳</span><span class="online-pill"><i></i> ONLINE</span></div><b>Your stack is watched.</b><p>Every failure becomes a lesson for next time.</p><div class="ai-progress"><span></span></div><small><span>Memory engine</span><strong>Healthy</strong></small></div>
+      <div class="user-row"><div class="user-avatar">DG</div><div><b>Demo workspace</b><small>Local prototype</small></div><span class="user-menu">···</span></div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar"><div class="mobile-brand"><span class="brand-symbol">◈</span><b>DockerGPT</b></div><div class="crumb">Workspace <span>/</span> <b id="crumb">Overview</b></div><div class="top-actions"><div class="live-chip api-offline" id="api-status" title="Backend connection status"><i class="live-dot"></i><span>CHECKING API</span></div><button class="round-btn" id="refresh" title="Refresh dashboard" aria-label="Refresh dashboard">↻</button><button class="profile-button">S</button></div></header>
+
+      <section class="view active" id="view-overview">
+        <div class="hero">
+          <div class="hero-copy"><div class="kicker"><span class="kicker-line"></span> DOCKER INTELLIGENCE, REIMAGINED</div><h1>Less firefighting.<br><span>More forward motion.</span></h1><p>Your containers fail. DockerGPT remembers why — and helps you recover smarter.</p><div class="hero-actions"><button class="btn btn-primary" id="jump-incidents">Review incidents <span>↗</span></button><button class="btn btn-ghost" id="jump-memory"><span class="play-icon">▷</span> Explore memory</button></div><div class="hero-foot"><span class="avatars"><i>J</i><i>M</i><i>A</i></span><span><b id="hero-lesson-count">Loading lessons</b> from your stack</span><span class="foot-separator">·</span><span class="green-text">+4 this week</span></div></div>
+          <div class="hero-visual"><div class="orbit orbit-a"></div><div class="orbit orbit-b"></div><div class="core-glow"></div><div class="core"><span>◈</span><small>MEMORY<br>ENGINE</small></div><div class="orbit-node node-a"><span>✓</span></div><div class="orbit-node node-b"><span>⌘</span></div><div class="orbit-node node-c"><span>↗</span></div><div class="orbit-node node-d"><span>◉</span></div><div class="floating-label label-a"><i></i> Pattern matched <b>94%</b></div><div class="floating-label label-b"><i></i> Recovery <b>38 sec</b></div></div>
+        </div>
+        <div class="stat-grid">
+          <article class="stat-card"><div class="stat-head"><span>Incidents detected</span><span class="stat-icon orange">⌁</span></div><div class="stat-number" data-count="24">0</div><div class="stat-foot"><span class="tiny-tag orange-tag">+3 today</span><span>across 4 services</span></div><div class="sparkline spark-orange"><i style="height:35%"></i><i style="height:48%"></i><i style="height:38%"></i><i style="height:65%"></i><i style="height:52%"></i><i style="height:78%"></i><i style="height:60%"></i><i style="height:94%"></i></div></article>
+          <article class="stat-card"><div class="stat-head"><span>Resolved with memory</span><span class="stat-icon violet">◈</span></div><div class="stat-number">62<span class="number-unit">%</span></div><div class="stat-foot"><span class="tiny-tag violet-tag">↑ 8.4%</span><span>vs. last week</span></div><div class="mini-progress"><i style="width:62%"></i></div><div class="progress-caption"><span>Memory-assisted fixes</span><b>62 / 100</b></div></article>
+          <article class="stat-card"><div class="stat-head"><span>Avg. recovery time</span><span class="stat-icon green">↗</span></div><div class="stat-number">38<span class="number-unit">s</span></div><div class="stat-foot"><span class="tiny-tag green-tag">↓ 91%</span><span>faster than manual</span></div><div class="recovery-bars"><span style="height:90%"></span><span style="height:65%"></span><span style="height:45%"></span><span style="height:24%"></span><span style="height:15%"></span></div></article>
+          <article class="stat-card"><div class="stat-head"><span>Suggestion accuracy</span><span class="stat-icon blue">✳</span></div><div class="stat-number">83<span class="number-unit">%</span></div><div class="stat-foot"><span class="tiny-tag blue-tag">High confidence</span><span>based on 21 lessons</span></div><div class="accuracy-ring"><svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="17" class="ring-bg"/><circle cx="22" cy="22" r="17" class="ring-value"/></svg><span>83%</span></div></article>
+        </div>
+
+        <div class="content-grid">
+          <section class="panel incident-panel"><div class="panel-heading"><div><div class="section-eyebrow">NEEDS YOUR ATTENTION</div><h2>Incident inbox <span class="count-pill" id="inbox-count">2</span></h2><p>Review a suggested fix before it runs.</p></div><button class="text-link" id="see-all">View all <span>→</span></button></div><div id="inbox-list" class="inbox-list"></div><div class="panel-bottom"><span class="pulse"></span> Incident stream is up to date <span class="mono">· JUST NOW</span></div></section>
+          <section class="panel activity-panel"><div class="panel-heading"><div><div class="section-eyebrow">SYSTEM PULSE</div><h2>Live activity</h2><p>What your stack has been up to.</p></div><span class="activity-live"><i></i> STREAMING</span></div><div class="activity-feed" id="activity-feed"></div><button class="activity-more" id="add-event">＋ Simulate activity event</button></section>
+        </div>
+        <section class="terminal-panel"><div class="terminal-head"><div class="terminal-title"><span class="terminal-dots"><i></i><i></i><i></i></span><b>docker-gpt <span>/</span> diagnostic stream</b></div><div class="terminal-status"><i></i> LISTENING</div></div><div class="terminal-body" id="terminal"><p><span class="terminal-time">19:42:01</span><span class="terminal-purple">memory.engine</span><span>·</span> Memory engine initialized. <span class="terminal-green">Ready for incidents.</span></p><p><span class="terminal-time">19:42:02</span><span class="terminal-purple">docker.watch</span><span>·</span> Connected to <span class="terminal-blue">production-stack</span></p><p><span class="terminal-time">19:42:03</span><span class="terminal-purple">pattern.match</span><span>·</span> 21 historical lessons loaded into context.</p></div></section>
+      </section>
+
+      <section class="view" id="view-incidents"><div class="page-title-row"><div><div class="kicker"><span class="kicker-line"></span> INCIDENT CENTER</div><h1>Every issue has a path forward.</h1><p>Inspect the diagnosis, compare it with memory, and decide what happens next.</p></div><button class="btn btn-primary" id="simulate-failure">＋ Simulate failure</button></div><div class="filter-row"><div class="filter-tabs" id="filter-tabs"><button class="selected" data-filter="all">All incidents <span id="all-count">4</span></button><button data-filter="pending">Needs approval <span id="pending-count">2</span></button><button data-filter="resolved">Resolved</button></div><span class="demo-note" id="data-mode-note">Connecting to DockerGPT API…</span></div><div id="full-incident-list" class="full-incident-list"></div></section>
+
+      <section class="view" id="view-memory"><div class="page-title-row"><div><div class="kicker"><span class="kicker-line"></span> YOUR COLLECTIVE KNOWLEDGE</div><h1>Failures remembered. Lessons retained.</h1><p>Search root causes and reuse fixes that worked before.</p></div><div class="memory-count"><b id="memory-total">—</b><span>saved lessons</span></div></div><div class="memory-search"><span>⌕</span><input id="memory-search" placeholder="Search errors, services, fixes…" aria-label="Search memory"><label><input type="checkbox" id="show-failed"> Include failed fixes</label></div><div class="memory-grid" id="memory-grid"></div></section>
+
+      <section class="view" id="view-metrics"><div class="page-title-row"><div><div class="kicker"><span class="kicker-line"></span> MEASURE THE DIFFERENCE</div><h1>Your memory is compounding.</h1><p>Every resolved incident makes the next one easier.</p></div><span class="period-select">Last 7 days <span>⌄</span></span></div><div class="comparison"><div><small>WITHOUT MEMORY</small><b>6m 52s</b><span>Average first-time resolution</span></div><div class="comparison-arrow">→</div><div><small>WITH MEMORY</small><b>38 sec</b><span>Average repeat resolution</span></div><div class="speedup"><b>10.8×</b><span>faster recovery</span></div></div><div class="metrics-grid"><article class="metric-panel"><span>Resolved by memory</span><b>62%</b><div class="metric-bar"><i style="width:62%"></i></div><small>↑ 8.4% vs last week</small></article><article class="metric-panel"><span>Suggestion accuracy</span><b>83%</b><div class="metric-bar"><i style="width:83%"></i></div><small>↑ 3.1% vs last week</small></article><article class="metric-panel"><span>Lessons captured</span><b id="lesson-count">21</b><div class="metric-bar"><i style="width:74%"></i></div><small>+4 this week</small></article></div><div class="panel chart-panel"><div class="panel-heading"><div><h2>Memory growth</h2><p>Saved lessons over the last seven days</p></div><span class="chart-legend"><i></i> Lessons saved</span></div><div class="chart-visual"><div class="chart-y"><span>24</span><span>18</span><span>12</span><span>6</span><span>0</span></div><svg viewBox="0 0 760 180" preserveAspectRatio="none" aria-label="Memory growth chart"><defs><linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9a87ff" stop-opacity=".28"/><stop offset="1" stop-color="#9a87ff" stop-opacity="0"/></linearGradient></defs><path class="chart-area" d="M0 155 L95 145 L190 125 L285 115 L380 100 L475 80 L570 64 L665 38 L760 20 L760 180 L0 180 Z"/><path class="chart-line" d="M0 155 L95 145 L190 125 L285 115 L380 100 L475 80 L570 64 L665 38 L760 20"/><circle cx="760" cy="20" r="5"/></svg></div><div class="chart-x"><span>Oct 19</span><span>Oct 20</span><span>Oct 21</span><span>Oct 22</span><span>Oct 23</span><span>Oct 24</span><span>Oct 25</span></div></div></section>
+      <footer class="page-footer"><span>◈ DockerGPT Memory</span><span>Built for calmer incident response.</span><span class="footer-version" id="footer-mode">API INTEGRATION · V1.1</span></footer>
+    </main>
+  </div>
+  <div class="modal-backdrop" id="modal-backdrop"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"><button class="modal-close" id="modal-close" aria-label="Close dialog">×</button><div class="modal-kicker">INCIDENT DIAGNOSTICS</div><h2 id="modal-title">Review suggested fix</h2><p id="modal-description"></p><div class="modal-block"><label>ROOT CAUSE</label><p id="modal-cause"></p></div><div class="modal-block"><label>PROPOSED FIX</label><pre id="modal-fix"></pre></div><div class="modal-note"><span>✳</span><p id="modal-rationale"></p></div><div class="modal-actions"><button class="btn btn-ghost" id="modal-reject">Reject suggestion</button><button class="btn btn-primary" id="modal-approve">Approve fix <span>→</span></button></div></div></div>
+  <div class="toast" id="toast"><span class="toast-mark">✓</span><span id="toast-text">Done</span></div>
+  <script src="script.js"></script>
+</body>
+</html>
