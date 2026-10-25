@@ -11,3 +11,4 @@ ruamel.yaml>=0.18
 python-dotenv>=1.0
 pydantic>=2.10
 pytest>=8.3
+fastembed>=0.4
